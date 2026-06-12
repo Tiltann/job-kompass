@@ -4,3 +4,4 @@ dist-tsnode
 *.tsbuildinfo
 *.local
 .DS_Store
+.claude
