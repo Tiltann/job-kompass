@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { ArrowLeft, ArrowRight, Check, PartyPopper, FileText } from 'lucide-vue-next'
 import { categoryIcons } from '../lib/icons'
 import { exportSubmissionPdf } from '../lib/exportPdf'
@@ -9,6 +9,7 @@ import QuestionField from './QuestionField.vue'
 const room = useRoom()
 const name = sessionStorage.getItem('participantName') || ''
 const submitted = ref(false)
+const restored = ref(false)
 const mySubmission = ref<Submission | null>(null)
 
 const answers = reactive<Answers>({})
@@ -16,13 +17,60 @@ const step = ref(0)
 const questions = room.activeQuestions
 const total = computed(() => questions.value.length)
 
-const current = computed(() => questions.value[step.value])
+const current = computed(() => questions.value[step.value] ?? questions.value[0])
 const isLast = computed(() => step.value === total.value - 1)
 const progress = computed(() => Math.round(((step.value + 1) / total.value) * 100))
 
-// scale and yes/no questions need an answer before moving on, text is optional
+// progress lives in localStorage per room and name, so a rejoin restores it
+const storageKey = `jobkompass:${room.code.value}:${name.trim().toLowerCase()}`
+
+type Saved = {
+  answers: Answers
+  step: number
+  submitted: boolean
+  submission: Submission | null
+}
+
+function load() {
+  try {
+    const raw = localStorage.getItem(storageKey)
+    if (!raw) return
+    const saved = JSON.parse(raw) as Saved
+    Object.assign(answers, saved.answers)
+    step.value = saved.step || 0
+    if (saved.submitted) {
+      submitted.value = true
+      mySubmission.value = saved.submission
+    }
+    restored.value = true
+  } catch {
+    // ignore a corrupt or unreadable entry
+  }
+}
+
+function save() {
+  const data: Saved = {
+    answers: { ...answers },
+    step: step.value,
+    submitted: submitted.value,
+    submission: mySubmission.value,
+  }
+  localStorage.setItem(storageKey, JSON.stringify(data))
+}
+
+load()
+
+// keep the saved copy current as the person answers and moves around
+watch([answers, step, submitted], save, { deep: true })
+
+// if the question set changes (e.g. tutor added questions), keep step in range
+watch(total, (t) => {
+  if (t > 0 && step.value > t - 1) step.value = t - 1
+})
+
 const canAdvance = computed(() => {
-  const q = current.value.question
+  const q = current.value?.question
+  if (!q) return false
   if (q.type === 'text') return true
   if (q.type === 'checkbox') return typeof answers[q.id] === 'boolean'
   return typeof answers[q.id] === 'number'
@@ -55,6 +103,9 @@ function back() {
       <div class="h-3 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
         <div class="h-full rounded-full bg-teal-500 transition-all duration-300" :style="{ width: progress + '%' }"></div>
       </div>
+      <p v-if="restored" class="mt-2 text-sm text-teal-600">
+        Willkommen zurück, deine bisherigen Antworten sind noch da.
+      </p>
     </header>
 
     <div class="flex flex-1 flex-col justify-center py-4">
