@@ -26,7 +26,7 @@ function onEnded() {
 <template>
   <div class="min-h-screen">
     <button
-      class="fixed right-4 top-4 z-10 flex items-center gap-2 rounded-full bg-white dark:bg-zinc-800 px-4 py-2.5 text-base font-semibold shadow-sm ring-1 ring-zinc-200 dark:ring-zinc-700"
+      class="fixed right-3 top-3 z-20 flex items-center gap-2 rounded-full bg-white dark:bg-zinc-800 px-3 py-2 text-base font-semibold shadow-sm ring-1 ring-zinc-200 dark:ring-zinc-700 sm:right-4 sm:top-4 sm:px-4 sm:py-2.5"
       @click="theme.toggle"
     >
       <Sun v-if="theme.isDark.value" class="h-5 w-5" />
@@ -34,7 +34,7 @@ function onEnded() {
       <span class="hidden sm:inline">{{ theme.isDark.value ? 'Hell' : 'Dunkel' }}</span>
     </button>
 
-    <main class="px-4 py-12">
+    <main class="px-4 pb-12 pt-20 sm:py-12">
       <StartView v-if="view === 'start'" @started="onStarted" />
       <QuestionSetup v-else-if="view === 'setup'" @ready="view = 'tutor'" />
       <TutorDashboard v-else-if="view === 'tutor'" @ended="onEnded" />

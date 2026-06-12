@@ -70,9 +70,9 @@ function tryEnd() {
 
 <template>
   <div class="mx-auto max-w-2xl">
-    <header class="mb-6 rounded-2xl bg-teal-600 p-6 text-white">
+    <header class="mb-6 rounded-2xl bg-teal-600 p-5 text-white sm:p-6">
       <p class="flex items-center gap-2 text-base opacity-90"><Link class="h-5 w-5" /> Raumcode zum Teilen</p>
-      <p class="text-5xl font-bold tracking-widest">{{ room.code.value }}</p>
+      <p class="break-all text-4xl font-bold tracking-[0.15em] sm:text-5xl sm:tracking-widest">{{ room.code.value }}</p>
       <p class="mt-3 flex items-start gap-2 text-base opacity-90">
         <TriangleAlert class="h-5 w-5 shrink-0" />
         <span>Lass dieses Fenster offen, solange der Raum laufen soll. Beim Schließen ist alles weg.</span>
@@ -102,26 +102,26 @@ function tryEnd() {
         <li
           v-for="p in room.participants"
           :key="p.id"
-          class="flex items-center gap-3 rounded-xl bg-white dark:bg-zinc-900 px-4 py-3 text-lg ring-1 ring-zinc-200 dark:ring-zinc-700"
+          class="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl bg-white dark:bg-zinc-900 px-4 py-3 text-lg ring-1 ring-zinc-200 dark:ring-zinc-700"
         >
           <CircleCheck v-if="p.submitted" class="h-6 w-6 shrink-0 text-teal-600" />
           <CircleDashed v-else class="h-6 w-6 shrink-0 text-zinc-400" />
-          <span class="flex-1">{{ p.name || 'Ohne Namen' }}</span>
-          <template v-if="p.submitted">
+          <span class="min-w-0 flex-1 truncate">{{ p.name || 'Ohne Namen' }}</span>
+          <div v-if="p.submitted" class="flex shrink-0 gap-2">
             <button
-              class="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-semibold text-teal-700 ring-1 ring-teal-200 dark:text-teal-300 dark:ring-teal-800 hover:bg-teal-50 dark:hover:bg-teal-950"
+              class="flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-semibold text-teal-700 ring-1 ring-teal-200 dark:text-teal-300 dark:ring-teal-800 hover:bg-teal-50 dark:hover:bg-teal-950"
               @click="openDetail(p.id)"
             >
               <Eye class="h-4 w-4" /> Ansehen
             </button>
             <button
-              class="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-semibold text-zinc-600 ring-1 ring-zinc-200 dark:text-zinc-300 dark:ring-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+              class="flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-semibold text-zinc-600 ring-1 ring-zinc-200 dark:text-zinc-300 dark:ring-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800"
               @click="exportSubmissionPdf(room.code.value, submissionFor(p.id)!, room.activeQuestions.value)"
             >
               <FileText class="h-4 w-4" /> PDF
             </button>
-          </template>
-          <span v-else class="text-sm text-zinc-400">füllt aus ...</span>
+          </div>
+          <span v-else class="shrink-0 text-sm text-zinc-400">füllt aus ...</span>
         </li>
       </ul>
       <p v-else class="rounded-xl bg-zinc-100 dark:bg-zinc-800 p-4 text-base text-zinc-500">
@@ -132,12 +132,12 @@ function tryEnd() {
     <section v-if="room.submissions.length" class="mb-8">
       <h2 class="mb-3 flex items-center gap-2 text-lg font-bold"><BarChart3 class="h-5 w-5 text-teal-600" /> Durchschnitt</h2>
       <div class="space-y-2 rounded-2xl bg-white dark:bg-zinc-900 p-5 ring-1 ring-zinc-200 dark:ring-zinc-700">
-        <div v-for="a in averages" :key="a.text" class="flex items-center gap-3 text-sm">
-          <span class="flex-1 text-zinc-600 dark:text-zinc-300">{{ a.text }}</span>
-          <div class="h-2 w-24 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+        <div v-for="a in averages" :key="a.text" class="flex items-center gap-2 text-sm sm:gap-3">
+          <span class="min-w-0 flex-1 text-zinc-600 dark:text-zinc-300">{{ a.text }}</span>
+          <div class="h-2 w-14 shrink-0 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800 sm:w-24">
             <div class="h-full bg-teal-500" :style="{ width: ((a.avg ?? 0) / 10) * 100 + '%' }"></div>
           </div>
-          <span class="w-10 text-right font-semibold">{{ a.avg !== null ? a.avg.toFixed(1) : '-' }}</span>
+          <span class="w-9 shrink-0 text-right font-semibold">{{ a.avg !== null ? a.avg.toFixed(1) : '-' }}</span>
         </div>
       </div>
     </section>

@@ -119,7 +119,7 @@ function back() {
       <QuestionField :question="current.question" v-model="answers[current.question.id]" />
     </div>
 
-    <div class="mt-6 flex items-center gap-3">
+    <div class="sticky bottom-3 z-10 mt-6 flex items-center gap-3">
       <button
         v-if="step > 0"
         type="button"
